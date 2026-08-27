@@ -2,6 +2,12 @@ pipeline {
 
     agent any
 
+    environment {
+        APP_NAME    = 'jenkins-lab-app'
+        DOCKER_REPO = 'kavan145/jenkins-lab-app'
+        APP_PORT    = '8082'
+    }
+
 
 
     stages {
