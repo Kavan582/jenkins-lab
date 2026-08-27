@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     stages {
+
         stage('Checkout') {
             steps {
                 echo 'Using GitHub repository...'
@@ -10,19 +11,25 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t jenkins-lab-app:1.0 .'
+                sh 'docker build -t jenkins-lab-app:${BUILD_NUMBER} .'
             }
         }
 
         stage('Verify Image') {
             steps {
-                sh 'docker images | grep jenkins-lab-app'
+                sh 'docker images jenkins-lab-app:${BUILD_NUMBER}'
             }
         }
 
         stage('Trivy Scan') {
             steps {
-                sh 'trivy image --scanners vuln --severity HIGH,CRITICAL --exit-code 1 jenkins-lab-app:1.0'
+                sh '''
+                    trivy image \
+                    --scanners vuln \
+                    --severity HIGH,CRITICAL \
+                    --exit-code 1 \
+                    jenkins-lab-app:${BUILD_NUMBER}
+                '''
             }
         }
 
@@ -34,9 +41,16 @@ pipeline {
                     passwordVariable: 'DOCKER_TOKEN'
                 )]) {
                     sh '''
-                        echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker tag jenkins-lab-app:1.0 $DOCKER_USER/jenkins-lab-app:1.0
-                        docker push $DOCKER_USER/jenkins-lab-app:1.0
+                        echo "$DOCKER_TOKEN" | docker login \
+                        -u "$DOCKER_USER" \
+                        --password-stdin
+
+                        docker tag \
+                        jenkins-lab-app:${BUILD_NUMBER} \
+                        $DOCKER_USER/jenkins-lab-app:${BUILD_NUMBER}
+
+                        docker push \
+                        $DOCKER_USER/jenkins-lab-app:${BUILD_NUMBER}
                     '''
                 }
             }
@@ -46,7 +60,11 @@ pipeline {
             steps {
                 sh '''
                     docker rm -f jenkins-lab-app || true
-                    docker run -d --name jenkins-lab-app -p 8082:80 jenkins-lab-app:1.0
+
+                    docker run -d \
+                    --name jenkins-lab-app \
+                    -p 8082:80 \
+                    jenkins-lab-app:${BUILD_NUMBER}
                 '''
             }
         }
