@@ -60,6 +60,12 @@ pipeline {
 
         }
 
+       stage('Failure Test') {
+           steps {
+        echo 'Testing Jenkins pipeline failure...'
+        sh 'exit 1'
+    }
+}
 
 
         stage('Build Docker Image') {
