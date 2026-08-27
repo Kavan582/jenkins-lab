@@ -2,10 +2,16 @@ pipeline {
 
     agent any
 
+
+
     environment {
+
         APP_NAME    = 'jenkins-lab-app'
+
         DOCKER_REPO = 'kavan145/jenkins-lab-app'
+
         APP_PORT    = '8082'
+
     }
 
 
@@ -23,17 +29,7 @@ pipeline {
             }
 
         }
- post {
-        success {
-            echo 'Pipeline completed successfully!'
-        }
 
-        failure {
-            echo 'Pipeline failed! Check the console output.'
-        }
-
-        always {
-            echo 'Pipeline execution finished.'
 
 
         stage('Environment Variables') {
@@ -50,6 +46,14 @@ pipeline {
 
                     echo "Build URL    : $BUILD_URL"
 
+
+
+                    echo "App Name     : $APP_NAME"
+
+                    echo "Docker Repo  : $DOCKER_REPO"
+
+                    echo "App Port     : $APP_PORT"
+
                 '''
 
             }
@@ -62,7 +66,13 @@ pipeline {
 
             steps {
 
-                sh 'docker build -t jenkins-lab-app:${BUILD_NUMBER} .'
+                sh '''
+
+                    docker build \
+
+                    -t ${APP_NAME}:${BUILD_NUMBER} .
+
+                '''
 
             }
 
@@ -74,7 +84,11 @@ pipeline {
 
             steps {
 
-                sh 'docker images jenkins-lab-app:${BUILD_NUMBER}'
+                sh '''
+
+                    docker images ${APP_NAME}:${BUILD_NUMBER}
+
+                '''
 
             }
 
@@ -96,7 +110,7 @@ pipeline {
 
                     --exit-code 1 \
 
-                    jenkins-lab-app:${BUILD_NUMBER}
+                    ${APP_NAME}:${BUILD_NUMBER}
 
                 '''
 
@@ -132,15 +146,15 @@ pipeline {
 
                         docker tag \
 
-                        jenkins-lab-app:${BUILD_NUMBER} \
+                        ${APP_NAME}:${BUILD_NUMBER} \
 
-                        $DOCKER_USER/jenkins-lab-app:${BUILD_NUMBER}
+                        ${DOCKER_REPO}:${BUILD_NUMBER}
 
 
 
                         docker push \
 
-                        $DOCKER_USER/jenkins-lab-app:${BUILD_NUMBER}
+                        ${DOCKER_REPO}:${BUILD_NUMBER}
 
                     '''
 
@@ -158,17 +172,17 @@ pipeline {
 
                 sh '''
 
-                    docker rm -f jenkins-lab-app || true
+                    docker rm -f ${APP_NAME} || true
 
 
 
                     docker run -d \
 
-                    --name jenkins-lab-app \
+                    --name ${APP_NAME} \
 
-                    -p 8082:80 \
+                    -p ${APP_PORT}:80 \
 
-                    jenkins-lab-app:${BUILD_NUMBER}
+                    ${APP_NAME}:${BUILD_NUMBER}
 
                 '''
 
@@ -184,9 +198,37 @@ pipeline {
 
                 sh 'sleep 3'
 
-                sh 'curl -f http://localhost:8082'
+                sh 'curl -f http://localhost:${APP_PORT}'
 
             }
+
+        }
+
+    }
+
+
+
+    post {
+
+        success {
+
+            echo 'Pipeline completed successfully!'
+
+        }
+
+
+
+        failure {
+
+            echo 'Pipeline failed! Check the console output.'
+
+        }
+
+
+
+        always {
+
+            echo 'Pipeline execution finished.'
 
         }
 
