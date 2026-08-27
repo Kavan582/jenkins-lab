@@ -23,7 +23,17 @@ pipeline {
             }
 
         }
+ post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
 
+        failure {
+            echo 'Pipeline failed! Check the console output.'
+        }
+
+        always {
+            echo 'Pipeline execution finished.'
 
 
         stage('Environment Variables') {
