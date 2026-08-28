@@ -100,6 +100,45 @@ stage('When Condition Test') {
             }
 
         }
+        stage('Parallel Checks') {
+
+            parallel {
+
+
+
+                stage('Docker Image Check') {
+
+                    steps {
+
+                        sh 'docker images ${APP_NAME}:${BUILD_NUMBER}'
+
+                    }
+
+                }
+
+
+
+                stage('Environment Check') {
+
+                    steps {
+
+                        sh '''
+
+                            echo "Application: $APP_NAME"
+
+                            echo "Docker Repo: $DOCKER_REPO"
+
+                            echo "Port: $APP_PORT"
+
+                        '''
+
+                    }
+
+                }
+
+            }
+
+        }
 
 
 
