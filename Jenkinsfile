@@ -60,25 +60,16 @@ pipeline {
 
         }
 
-stage('Main Branch Check') {
+stage('When Condition Test') {
 
     when {
-
-        branch 'main'
-
-    }
-
-
-
-    steps {
-
-        echo 'This pipeline is running from the main branch.'
-
-    }
-
+    expression {
+            return env.JOB_NAME == 'my-first-pipeline-jenkins'
+        }
+     
 }
 
-        stage('Build Docker Image') {
+       stage('Build Docker Image') {
 
             steps {
 
