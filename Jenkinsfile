@@ -242,4 +242,3 @@ stage('When Condition Test') {
     }
 
 }
-}
