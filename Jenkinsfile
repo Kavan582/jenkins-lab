@@ -60,7 +60,23 @@ pipeline {
 
         }
 
+stage('Main Branch Check') {
 
+    when {
+
+        branch 'main'
+
+    }
+
+
+
+    steps {
+
+        echo 'This pipeline is running from the main branch.'
+
+    }
+
+}
 
         stage('Build Docker Image') {
 
