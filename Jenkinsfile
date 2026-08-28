@@ -66,8 +66,11 @@ stage('When Condition Test') {
     expression {
             return env.JOB_NAME == 'my-first-pipeline-jenkins'
         }
-     
-}
+    }
+    steps {
+                echo 'WHEN condition is TRUE. This stage is executing.'
+            }
+        }     
 
        stage('Build Docker Image') {
 
