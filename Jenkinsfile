@@ -201,7 +201,12 @@ pipeline {
         }
 
 
-
+        stage('Production Approval') {
+        steps {
+             input message: 'Deploy this build to production?',
+              ok: 'Proceed'
+    }
+}
         stage('Deploy Container') {
 
             steps {
