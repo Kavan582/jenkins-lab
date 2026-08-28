@@ -60,29 +60,37 @@ pipeline {
 
         }
 
-stage('When Condition Test') {
 
-    when {
-    expression {
-            return env.JOB_NAME == 'my-first-pipeline-jenkins'
-        }
-    }
-    steps {
-                echo 'WHEN condition is TRUE. This stage is executing.'
+
+        stage('When Condition Test') {
+
+            when {
+
+                expression {
+
+                    return env.JOB_NAME == 'my-first-pipeline-jenkins'
+
+                }
+
             }
-        }     
 
-       stage('Build Docker Image') {
+
 
             steps {
 
-                sh '''
+                echo 'WHEN condition is TRUE. This stage is executing.'
 
-                    docker build \
+            }
 
-                    -t ${APP_NAME}:${BUILD_NUMBER} .
+        }
 
-                '''
+
+
+        stage('Build Docker Image') {
+
+            steps {
+
+                sh 'docker build -t ${APP_NAME}:${BUILD_NUMBER} .'
 
             }
 
@@ -94,15 +102,14 @@ stage('When Condition Test') {
 
             steps {
 
-                sh '''
-
-                    docker images ${APP_NAME}:${BUILD_NUMBER}
-
-                '''
+                sh 'docker images ${APP_NAME}:${BUILD_NUMBER}'
 
             }
 
         }
+
+
+
         stage('Parallel Checks') {
 
             parallel {
@@ -149,19 +156,7 @@ stage('When Condition Test') {
 
             steps {
 
-                sh '''
-
-                    trivy image \
-
-                    --scanners vuln \
-
-                    --severity HIGH,CRITICAL \
-
-                    --exit-code 1 \
-
-                    ${APP_NAME}:${BUILD_NUMBER}
-
-                '''
+                sh 'trivy image --scanners vuln --severity HIGH,CRITICAL --exit-code 1 ${APP_NAME}:${BUILD_NUMBER}'
 
             }
 
@@ -183,27 +178,19 @@ stage('When Condition Test') {
 
                 )]) {
 
+
+
                     sh '''
 
-                        echo "$DOCKER_TOKEN" | docker login \
-
-                        -u "$DOCKER_USER" \
-
-                        --password-stdin
+                        echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USER" --password-stdin
 
 
 
-                        docker tag \
-
-                        ${APP_NAME}:${BUILD_NUMBER} \
-
-                        ${DOCKER_REPO}:${BUILD_NUMBER}
+                        docker tag ${APP_NAME}:${BUILD_NUMBER} ${DOCKER_REPO}:${BUILD_NUMBER}
 
 
 
-                        docker push \
-
-                        ${DOCKER_REPO}:${BUILD_NUMBER}
+                        docker push ${DOCKER_REPO}:${BUILD_NUMBER}
 
                     '''
 
@@ -227,11 +214,11 @@ stage('When Condition Test') {
 
                     docker run -d \
 
-                    --name ${APP_NAME} \
+                        --name ${APP_NAME} \
 
-                    -p ${APP_PORT}:80 \
+                        -p ${APP_PORT}:80 \
 
-                    ${APP_NAME}:${BUILD_NUMBER}
+                        ${APP_NAME}:${BUILD_NUMBER}
 
                 '''
 
@@ -245,9 +232,13 @@ stage('When Condition Test') {
 
             steps {
 
-                sh 'sleep 3'
+                sh '''
 
-                sh 'curl -f http://localhost:${APP_PORT}'
+                    sleep 3
+
+                    curl -f http://localhost:${APP_PORT}
+
+                '''
 
             }
 
@@ -258,6 +249,8 @@ stage('When Condition Test') {
 
 
     post {
+
+
 
         success {
 
