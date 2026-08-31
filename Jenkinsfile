@@ -132,7 +132,33 @@ pipeline {
 
         }
 
+stage('Create Build Artifact') {
 
+    steps {
+
+        sh '''
+
+            mkdir -p artifacts
+
+            echo "Application: ${APP_NAME}" > artifacts/build-info.txt
+
+            echo "Build Number: ${BUILD_NUMBER}" >> artifacts/build-info.txt
+
+            echo "Docker Image: ${DOCKER_REPO}:${BUILD_NUMBER}" >> artifacts/build-info.txt
+
+            echo "Build Date: $(date)" >> artifacts/build-info.txt
+
+        '''
+
+
+
+        archiveArtifacts artifacts: 'artifacts/*',
+
+                         fingerprint: true
+
+    }
+
+}
 
         stage('Verify Image') {
 
