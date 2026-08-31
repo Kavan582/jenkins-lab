@@ -1,5 +1,41 @@
 pipeline {
+pipeline {
 
+    agent {
+
+        label 'linux-agent'
+
+    }
+
+
+
+    triggers {
+
+        cron('H 3 * * *')
+
+    }
+
+
+
+    environment {
+
+        APP_NAME    = 'jenkins-lab-app'
+
+        DOCKER_REPO = 'kavan145/jenkins-lab-app'
+
+        APP_PORT    = '8082'
+
+    }
+
+
+
+    stages {
+
+        // existing stages
+
+    }
+
+}
 
 
     agent {
