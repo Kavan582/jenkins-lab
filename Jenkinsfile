@@ -1,5 +1,4 @@
 pipeline {
-pipeline {
 
     agent {
 
@@ -11,7 +10,7 @@ pipeline {
 
     triggers {
 
-        cron('H 3 * * *')
+        cron('H/5 * * * *')
 
     }
 
