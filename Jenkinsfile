@@ -1,7 +1,11 @@
 pipeline {
 
-     agent {
+
+
+    agent {
+
         label 'linux-agent'
+
     }
 
 
@@ -26,7 +30,30 @@ pipeline {
 
             steps {
 
-                echo 'Using GitHub repository...'
+                checkout scm
+
+            }
+
+        }
+
+
+
+        stage('SonarQube Analysis') {
+
+            steps {
+
+                script {
+
+                    def scannerHome = tool 'SonarScanner'
+
+                    withSonarQubeEnv('SonarQube') {
+
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=jenkins-lab -Dsonar.sources=."
+
+
+                    }
+
+                }
 
             }
 
@@ -76,8 +103,6 @@ pipeline {
 
             }
 
-
-
             steps {
 
                 echo 'WHEN condition is TRUE. This stage is executing.'
@@ -116,8 +141,6 @@ pipeline {
 
             parallel {
 
-
-
                 stage('Docker Image Check') {
 
                     steps {
@@ -127,8 +150,6 @@ pipeline {
                     }
 
                 }
-
-
 
                 stage('Environment Check') {
 
@@ -180,17 +201,11 @@ pipeline {
 
                 )]) {
 
-
-
                     sh '''
 
                         echo "$DOCKER_TOKEN" | docker login -u "$DOCKER_USER" --password-stdin
 
-
-
                         docker tag ${APP_NAME}:${BUILD_NUMBER} ${DOCKER_REPO}:${BUILD_NUMBER}
-
-
 
                         docker push ${DOCKER_REPO}:${BUILD_NUMBER}
 
@@ -203,12 +218,21 @@ pipeline {
         }
 
 
+
         stage('Production Approval') {
-        steps {
-             input message: 'Deploy this build to production?',
-              ok: 'Proceed'
-    }
-}
+
+            steps {
+
+                input message: 'Deploy this build to production?',
+
+                      ok: 'Proceed'
+
+            }
+
+        }
+
+
+
         stage('Deploy Container') {
 
             steps {
@@ -257,23 +281,17 @@ pipeline {
 
     post {
 
-
-
         success {
 
             echo 'Pipeline completed successfully!'
 
         }
 
-
-
         failure {
 
             echo 'Pipeline failed! Check the console output.'
 
         }
-
-
 
         always {
 
