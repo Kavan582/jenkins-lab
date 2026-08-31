@@ -242,30 +242,22 @@ pipeline {
 
 
 
-        stage('Deploy Container') {
 
-            steps {
+stage('Deploy Container') {
 
-                sh '''
+    steps {
 
-                    docker rm -f ${APP_NAME} || true
+        sh '''
 
+            docker rm -f ${APP_NAME} || true
 
+            docker run -d --name ${APP_NAME} -p ${APP_PORT}:80 ${DOCKER_REPO}:${BUILD_NUMBER}
 
-                    docker run -d \
+        '''
 
-                        --name ${APP_NAME} \
+    }
 
-                        -p ${APP_PORT}:80 \
-
-                        ${APP_NAME}:${BUILD_NUMBER}
-
-                '''
-
-            }
-
-        }
-
+}
 
 
         stage('Test Application') {
