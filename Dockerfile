@@ -2,7 +2,11 @@ FROM nginx:alpine
 
 
 
-RUN apk upgrade --no-cache
+RUN apk update && \
+
+    apk upgrade --no-cache && \
+
+    apk add --no-cache --upgrade expat
 
 
 
