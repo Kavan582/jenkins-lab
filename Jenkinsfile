@@ -130,7 +130,7 @@ pipeline {
 
             steps {
 
-                sh 'docker build -t ${APP_NAME}:${BUILD_NUMBER} .'
+        sh 'docker build --pull --no-cache -t ${APP_NAME}:${BUILD_NUMBER} .'
 
             }
 
