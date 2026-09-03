@@ -1,3 +1,5 @@
+@Library('jenkins-shared-library') _
+
 pipeline {
 
     agent {
@@ -10,7 +12,7 @@ pipeline {
 
     triggers {
 
-        cron('H/5 * * * *')
+    cron('H 2 * * *')
 
     }
 
@@ -130,7 +132,7 @@ pipeline {
 
             steps {
 
-        sh 'docker build --pull --no-cache -t ${APP_NAME}:${BUILD_NUMBER} .'
+               dockerBuild("${APP_NAME}")
 
             }
 
